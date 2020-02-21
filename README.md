@@ -5,14 +5,14 @@ Authorization team for the BUILD Internal House Project. Our goal is to link the
 ## Setup
 For this project you will need to install [Node.js](https://nodejs.org/en/download/). This will come with the capability to use Node.js to host a server, and with npm (node package manager). This will allow you to download all the required dependencies all at once in the correct folder, instead of one by one. To use, in your appropiate command prompt run
 
-`node`
+```node```
 
 This should open the node command prompt. Then, navigate to the folder you cloned the repo (C:\pathname\owl). Then, run
 
-`npm install`
+```npm install```
 
 This should install all the required dependencies for Owl. To run the hello world program, run
 
-`node server.js`
+```node server.js```
 
 The command prompt will display the 'Hello world!' message.
