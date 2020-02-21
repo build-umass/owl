@@ -1,2 +1,2 @@
-# owl
-Internal House Project - Auth
+# Owl - Authorization team for the Internal House Project
+
