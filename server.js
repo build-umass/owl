@@ -4,6 +4,7 @@ const passport = require('passport');
 var app = express();
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static("public"));
 var server = app.listen(3000);
 
 console.log("Server running on port 3000...")
