@@ -21,4 +21,4 @@ This should install all the required dependencies for Owl. Finally, to run the h
 node server.js
 ```
 
-A 'Hello world!' message will be displayed on the command prompt and on the website hosted at [http://localhost:3000].
+A 'Hello world!' message will be displayed on the command prompt and on the website hosted at [](http://localhost:3000).
