@@ -19,8 +19,10 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
+userDict = {}
+
 //Handle post request on login
-app.post('/auth', function(request, response) {
+app.post('/login', function(request, response) {
 	const username = request.body.username;
 	const password = request.body.password;
 	if (username && password) {
