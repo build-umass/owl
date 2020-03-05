@@ -19,20 +19,21 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
-userDict = {}
+const userDict = {}
 
 //Handle post request on login
 app.post('/login', function(request, response) {
 	const username = request.body.username;
 	const password = request.body.password;
-	if (username && password) {
+	if (userDict[username] === password) {
+		
         //This should eventually be changed to use JWT
         request.session.loggedin = true;
         request.session.username = username;
         //Do something with password
         response.redirect('/home')
 	} else {
-		response.send('Please enter Username and Password!');
+		response.send('Incorrect username or password.');
 		response.end();
 	}
 });
