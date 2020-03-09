@@ -48,6 +48,19 @@ app.get('/home', function(request, response) {
 	response.end();
 });
 
+//Handle post request on signup
+app.post('/signup', function(request, response){
+	const username = request.body.username;
+	const password = request.body.password;
+
+	if(username in userDict){
+		response.send("This username is already taken.");
+		response.end();
+	}else{
+		userDict.put(username, passowrd);
+		response.redirect('/login')
+	}
+});
 //Start server
 const server = app.listen(3000);
 
