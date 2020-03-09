@@ -57,7 +57,7 @@ app.post('/signup', function(request, response){
 		response.send("This username is already taken.");
 		response.end();
 	}else{
-		userDict.put(username, passowrd);
+		userDict[username] = password;
 		response.redirect('/login')
 	}
 });
