@@ -58,7 +58,8 @@ app.post('/signup', function(request, response){
 		response.end();
 	}else{
 		userDict[username] = password;
-		response.redirect('/login')
+		response.redirect('/index.html');
+		response.end();
 	}
 });
 //Start server
