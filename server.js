@@ -15,95 +15,68 @@ app.use(bodyParser.json());
 
 const userDict = {}
 
-//Handle post request on login
-app.post('/login', (request, response) => {
-	const user = {
-		username: request.body.username,
-		password: request.body.password
-	}
-	//Auth stuff should go here, obviously password shouldn't be stored in this way but this is just testing purposes for now
-	jwt.sign({user}, 'secretkey', { expiresIn: '30s' }, (error, token) => {
-		if(error){
-			response.json({
-				message: 'JWT failed to authenticate. Please try again.'
-			});
-		} else {
-			response.json({
-				token
-			});
-		}
-	});
-	console.log(request.headers)
-	if (userDict[user.username] === user.password) {
-        response.redirect('/home');
+app.get('/home', verifyToken, (req, res) => {
+    res.send('Welcome back ' + res.user.username + '!');
+});
+
+app.post('/login', (req, res) =>{
+    const user = {
+        username: req.body.username,
+		password: req.body.password
+    }
+    //Usually we wouldn't store the users password like this, and instead first compare if the password matches then create the user with perhaps id, email, username
+    if (userDict[user.username] === user.password) {
+        jwt.sign({user:user}, 'secretkey', {expiresIn: '30m' }, (err,token) => {
+            res.json({
+                token: token
+            })
+        });
+        //Not sure what to do after login yet, redirecting to home discard the JWT information. Front end would have to store the JWT and we would retrieve it I believe
+        //res.redirect('/home')
 	} else {
-		response.send('Incorrect username or password.');
-		response.end();
+		res.send('Incorrect username or password.');
 	}
 });
 
-//Handle get request after login
-app.get('/home', verifyToken, (request, response) => {
-	jwt.verify(request.token, 'secretkey', (error, authData) => {
-		if(error){
-			response.send('Please login to view this page!');
-		}
-		else {
-			response.json({
-				message: "Welcome back, " + authData.user + '!'
-			})
-		}		
-	});
-	response.end();
-});
-
-app.post('/api/posts', verifyToken, (request, response) => {
-	jwt.verify(request.token, 'secretkey', (error, authData) => {
-		if(error){
-			response.sendStatus(403);
-		}
-		else {
-			response.json({
-				message: "Success!",
-				authData
-			})
-		}		
-	});
-	response.end();
-});
-
-
-//Handle post request on signup
-app.post('/signup', (request, response) => {
-	const username = request.body.username;
-	const password = request.body.password;
+app.post('/signup', (req, res) => {
+	const username = req.body.username;
+	const password = req.body.password;
+	//Password should be hashed as they signup, not stored like above
 	if(username in userDict){
-		response.send("This username is already taken.");
-		response.end();
+		res.send("This username is already taken.");
 	}else{
 		userDict[username] = password;
-		response.redirect('/index.html');
-		response.end();
+		res.redirect('/index.html');
 	}
 });
 
-//JWT token verification
-function verifyToken(request, response, next) {
-	const header = request.headers['authorization'];
-	if(typeof header !== 'undefined'){
-		const bearer = header.split(' ');
-		const bearerToken = bearer[1];
-		request.token = bearerToken;
-		next();
-	} else {
-		//Forbidden response code
-		response.sendStatus(403);
-	}
-}
 
+function verifyToken(req, res, next) {
+    console.log(req.headers)
+    const header = req.headers['authorization'];
+    if(typeof header !== 'undefined'){
+        token = header.split(' ')[1];
+        jwt.verify(token, 'secretkey', (err, authData) => {
+            if(err){
+                console.log(err);
+                res.sendStatus(403);
+            } else {
+                res.user = authData.user
+                // res.json({
+                //     message: 'Post created',
+                //     authData: authData
+                // });
+            }
+        });
+        next();
+    } else {
+        res.sendStatus(403);
+    }
+}
 
 //Start server
 const server = app.listen(3000, () => console.log("Server running on port 3000..."));
 
 //Output test
 console.log("Hello world!")
+
