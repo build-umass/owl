@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 //Initialize passport and express
 const app = express();
@@ -20,22 +21,45 @@ app.get('/home', verifyToken, (req, res) => {
 });
 
 app.post('/login', (req, res) =>{
+    const { errors, isValid } = validateLoginInput(req.body);
+    if(!isValid) {
+        return res.status(400).json(errors);
+    }
+
     const user = {
         username: req.body.username,
 		password: req.body.password
     }
+
+    // not sure if we still have username or if it's changing to email
+    User.findOne({ email }).then(user => {
+        if(!user) {
+            errors.email = 'User not found';
+            return res.status(404).json({email: 'User not found'});
+        }
+
+        bcrypt.compare(password, user.password).then(isMatch => {
+            if(isMatch) {
+                const payload = {
+                    // for when we add an id
+                    // id: user.id
+                    name: user.name
+                };
+                jwt.sign({user:user}, 'secretkey', {expiresIn: '30m' }, (err,token) => {
+                    res.json({
+                        token: token
+                    })
+                });
+            } else {
+                errors.password = 'Password Incorrect';
+                return res.status(400).json(errors);
+            }
+        })
+    })
     //Usually we wouldn't store the users password like this, and instead first compare if the password matches then create the user with perhaps id, email, username
-    if (userDict[user.username] === user.password) {
-        jwt.sign({user:user}, 'secretkey', {expiresIn: '30m' }, (err,token) => {
-            res.json({
-                token: token
-            })
-        });
         //Not sure what to do after login yet, redirecting to home discard the JWT information. Front end would have to store the JWT and we would retrieve it I believe
         //res.redirect('/home')
-	} else {
-		res.send('Incorrect username or password.');
-	}
+	
 });
 
 app.post('/signup', (req, res) => {
